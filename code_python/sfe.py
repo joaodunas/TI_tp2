@@ -1,62 +1,85 @@
+from math import log2, ceil
+import numpy as np
+
+def getFonteTexto(file):
+    letras = []
+    fTexto = open(file, 'r')
+    # cria fonte de texto
+    range1 = np.arange(65, 91)
+    range2 = np.arange(97, 123)
+    alfabetoTxt = np.concatenate((range1, range2))
+    for letra in fTexto.read():
+        l = ord(letra)
+        letras.append(l)
+
+    fTexto.close()
+    fonteTexto = np.asarray(letras)
+    mask = np.isin( np.unique(fonteTexto),alfabetoTxt)
+    for i in range(len(mask)):
+        if (mask[i] == False):
+            alfabetoTxt = np.append(alfabetoTxt, np.unique(fonteTexto)[i])
+    return fonteTexto, alfabetoTxt
+
 def probabilidades(fonte, alfabeto):
     prob = {}
     for letra in alfabeto:
         prob.update({letra: 1})
     for elemento in fonte:
         prob[elemento] += 1
+    for e in prob:
+        prob[e] /= len(fonte)
 
     return prob
 
+def compute_cdf(dict):
+    cdf = {}
+    prev_val = 0
 
-def shannon_fano(dict):
-    def shannon_fano_rec(pair, dict):
-        if (len(pair[0]) > 1):
-            pair[0] = shannon_fano_rec(split(pair[0], dict), dict)
-        if (len(pair[1]) > 1):
-            pair[1] = shannon_fano_rec(split(pair[1], dict), dict)
+    for letter, value in dict.items():
+        cdf[letter] = value + prev_val
+        prev_val = cdf[letter]
 
-        return [pair[0], pair[1]]
-
-    ordered_keys = sorted(dict, key=dict.get, reverse=True)
-    result_array = shannon_fano_rec(split(ordered_keys, dict), dict)
-    result = decodeArray(result_array)
-    return result
+    return cdf
 
 
-def split(ordered_keys, dict):
-    result = []
-    right_sum = sum(list(map(lambda x: dict[x], ordered_keys)))
-    left_sum = 0
+def code(mids, probs):
+    codes = {}
 
-    while right_sum - left_sum > 0:
-        last_diff = right_sum - left_sum
-        first_key = ordered_keys[0]
-        right_sum -= dict[first_key]
-        left_sum += dict[first_key]
-        if right_sum - left_sum > 0:
-            ordered_keys.pop(0)
-            result.append(first_key)
-        else:
-            if abs(last_diff) > abs(right_sum - left_sum):
-                ordered_keys.pop(0)
-                result.append(first_key)
+    for letter, value in mids.items():
+        length = ceil(log2(1/probs[letter])) + 1
+        fraction = int(str(value).split('.')[1])
+        code = ''
+        for _ in range(length):
+            fraction = float('0.' + str(fraction))*2
+            whole, fract = str(fraction).split('.')
+            code += whole
+            fraction = int(fract)
+        codes[letter] = code
 
-    return [result, ordered_keys]
+    return codes
 
 
-def decodeArray(arr):
-    result = {}
+def shannon_fano_elias_code(dict):
+    cdf = compute_cdf(dict)
+    midpoints = {letter: round(f - dict[letter]/2, 7) for letter, f in cdf.items()}
+    codes = code(midpoints, dict)
+    return codes
 
-    def decodeArrayRec(arr, num):
-        if (len(arr[0]) == 1):
-            result[arr[0][0]] = num + '0'
-        else:
-            decodeArrayRec(arr[0], num + '0')
 
-        if (len(arr[1]) == 1):
-            result[arr[1][0]] = num + '1'
-        else:
-            decodeArrayRec(arr[1], num + '1')
+def shannon_fano_elias_decode(number, probs):
+    bottom, top = 0, 1
+    cdf = compute_cdf(probs)
+    for c in str(number):
+        diff = (top - bottom)/2
+        if int(c) == 1:
+            bottom += diff
+        elif int(c) == 0:
+            top -= diff
 
-    decodeArrayRec(arr, '')
+    result = ''
+    for letter, f in cdf.items():
+        if top <= f:
+            result = letter
+            break
+
     return result

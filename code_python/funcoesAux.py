@@ -1,5 +1,3 @@
-from os import system
-import sfe
 import numpy as np
 
 
@@ -53,16 +51,3 @@ def run_length_encode_ascii(x):
     y[count] = length
 
     return y[:count + 1]
-
-
-def main():
-    f = open('adaptiveBible.txt', 'r')
-    fonte = f.read()
-    fonteArray = np.fromstring(fonte,sep="")
-    fonteArrayRle=run_length_encode_ascii(fonteArray)
-    
-    print(fonteArray)
-
-
-if __name__ == "__main__":
-    main()
