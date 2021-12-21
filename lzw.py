@@ -68,6 +68,7 @@ class ByteEncoder(object):
     compressed bytes, usable by L{ByteDecoder}. Combines an L{Encoder}
     with a L{BitPacker}.
 
+    True
     """
 
     def __init__(self, max_width=DEFAULT_MAX_BITS):
@@ -636,6 +637,12 @@ def intfrombits(bits):
 
 
 def bytestobits(bytesource):
+    """
+    Breaks a given iterable of bytes into an iterable of boolean
+    values representing those bytes as unsigned integers.
+
+
+    """
     for b in bytesource:
 
         value = unpackbyte(b)

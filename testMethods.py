@@ -16,7 +16,7 @@ def main():
     uncompressed = lzw.decompress(i)
     with open("C:\\Users\\35191\\Downloads\\TP2\\dataset\\biblelzw.txt", 'w') as file:
         for bt in uncompressed:
-            file.write(str(bt))
+            file.write(bt.decode("utf-8"))
 
 if __name__ == "__main__":
     main()
