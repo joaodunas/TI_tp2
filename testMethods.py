@@ -1,42 +1,22 @@
-from code_python import sfe
-from code_python import funcoesAux
-import numpy as np
 
-
-def add2(binary):
-    decimal = 0
-    if len(binary) < 8:
-        decimal = int(binary, 2)
-    else:
-        split_strings = []
-        s = 0
-        for index in range(0, len(binary), 8):
-            split_strings.append(binary[index: index + 8])
-        print(split_strings)
-
-        for i in split_strings:
-            s += len(str(decimal))-1
-            decimal += int(i, 2) * 10 ** s
-    return decimal
-
-
-def dicPLista(dict):
-    data = list(dict.items())
-    an_array = np.array(data)
-    print(an_array)
-    return an_array
+import lzwencoder
+import lz78
+import lzw
 
 
 def main():
-    lista = dicPLista(sfe.shannon_fano_elias_code(
-            sfe.probabilidades(sfe.getFonteTexto("original_files/bible.txt")[0],
-                               sfe.getFonteTexto("original_files/bible.txt")[1])))
-
-    sfe.shannon_fano_elias_decode()
-
-
-
-
+    #lzwencoder.encode("C:\\Users\\35191\\Downloads\\TP2\\dataset\\bible.txt")
+    #lzwencoder.decode("C:\\Users\\35191\\Downloads\\TP2\\dataset\\bible.lzw")
+    #lz78.encodeLZ("C:\\Users\\35191\\Downloads\\TP2\\dataset\\bible.txt", "C:\\Users\\35191\\Downloads\\TP2\\dataset\\bible.lz78")
+    #lz78.decodeLZ("C:\\Users\\35191\\Downloads\\TP2\\dataset\\bible.lz78", "C:\\Users\\35191\\Downloads\\TP2\\dataset\\bibledecodelz78.txt")
+    infile = lzw.readbytes("C:\\Users\\35191\\Downloads\\TP2\\dataset\\bible.txt")
+    compressed = lzw.compress(infile)
+    lzw.writebytes("C:\\Users\\35191\\Downloads\\TP2\\dataset\\bible.lzw", compressed)
+    i = lzw.readbytes("C:\\Users\\35191\\Downloads\\TP2\\dataset\\bible.lzw")
+    uncompressed = lzw.decompress(i)
+    with open("C:\\Users\\35191\\Downloads\\TP2\\dataset\\biblelzw.txt", 'w') as file:
+        for bt in uncompressed:
+            file.write(str(bt))
 
 if __name__ == "__main__":
     main()
