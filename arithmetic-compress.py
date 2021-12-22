@@ -13,7 +13,7 @@
 # https://github.com/nayuki/Reference-arithmetic-coding
 # 
 
-import contextlib, sys
+import contextlib
 import arithmeticcoding
 
 

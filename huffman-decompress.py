@@ -10,7 +10,6 @@
 # https://github.com/nayuki/Reference-Huffman-coding
 # 
 
-import sys
 import huffmancoding
 
 
